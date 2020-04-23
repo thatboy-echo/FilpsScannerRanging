@@ -1,9 +1,7 @@
 # FilpsScannerRanging
- FILPS激光雷达扫描测距
+ *FILPS激光雷达扫描测距*
 
-:pen:***thatboy***
-
-[![thatboy](https://avatars0.githubusercontent.com/u/46275725?s=460&u=c5735554d6fadaad4d4e293b045fe8d1b3541ee6&v=4)](https://github.com/thatboy-mercy)
+[![thatboy](http://thatboy.info:5120/uploads/big/b2e9968666affee1bc20188f95f2d3ef.png)](https://github.com/thatboy-mercy) ***thatboy*** :pen:
 
 ## :apple: REFERENCE
 
@@ -15,3 +13,9 @@
 ## :orange: PROJECT
 
 - [![SDK](http://thatboy.info:5120/uploads/big/6e42015bb1a38f354e79a7a465580288.png)SDK](./TryLIM20)
+
+## :paperclip: PLAN
+
+- [x] 雷达设备测试
+- [x] API数据测试
+- [ ] 数据转换测试
