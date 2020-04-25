@@ -45,6 +45,8 @@ public:
 	std::string deviceIP;
 	double angleBeg = -45;
 	double angleEnd = 225;
+	double borderContinusLen = 100;
+	size_t BorderLeastNumber = 3;
 
 	int cid = 0XFFFFFFF;
 
@@ -53,15 +55,18 @@ public:
 	std::vector<POINT> drawPolyCoord;
 	std::vector<PolarCoord> polarCoord;
 	std::vector<RectaCoord> rectaCoord;
+	std::vector<std::vector<RectaCoord>> borderStore;
 
 	inline static std::mutex staticDataLock;
 	inline static int OnlineDeviceNumber = 0;
 	inline static int SerialCID = 0x80;
 	inline static bool hasDeviceTryConnected = false;
 	inline static std::map<int, LimDevice> DeviceList;
-public:
+
 	void LockCoord() { coordLock.lock(); }
 	void UnlockCoord() { coordLock.unlock(); }
+	void SetBorderContinusLen(double len) { borderContinusLen = len; }
+	void SetBorderLeastNumber(size_t num) { BorderLeastNumber = num; }
 
 	~LimDevice()
 	{
@@ -100,6 +105,7 @@ public:
 	}
 
 protected:
+
 	void calcRectaCoord()
 	{
 		size_t indexWrite = 0;
@@ -123,6 +129,29 @@ protected:
 			rectaCoord.resize(indexWrite);
 			drawPolyCoord.resize(indexWrite + 1);
 		}
+
+		// Border
+		double borderContinusLen2 = borderContinusLen * borderContinusLen;
+		borderStore.clear();
+		std::vector<RectaCoord> border;
+		for (const auto& pt : rectaCoord)
+		{
+			if (border.empty())
+				border.push_back(pt);
+			else
+			{
+				auto& last = border.back();
+				if ((pt.x - last.x) * (pt.x - last.x) + (pt.y - last.y) * (pt.y - last.y) > borderContinusLen2)
+				{
+					if (border.size() >= BorderLeastNumber)
+						borderStore.push_back(border);
+					border.clear();
+				}
+				border.push_back(pt);
+			}
+		}
+		if (border.size() >= BorderLeastNumber)
+			borderStore.push_back(border);
 	}
 
 	void onLMDRecive(LIM_HEAD& lim)
