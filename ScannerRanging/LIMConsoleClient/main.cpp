@@ -63,6 +63,7 @@ void quit(const httplib::Request&, httplib::Response&)
 
 int main()
 {
+	FreeConsole();
 	LimDevice::InitEquipment();
 	LimDevice::OpenEquipment("192.168.1.210");
 	LimDevice::WaitFirstDeviceConnected();
