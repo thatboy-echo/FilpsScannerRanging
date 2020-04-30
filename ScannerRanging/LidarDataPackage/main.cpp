@@ -15,8 +15,7 @@ int main()
 	LimDevice::WaitFirstDeviceConnected();
 	LimDevice::StartLMDData();
 
-	EasyPX::initgraph(900, 900, EasyPX::EW_EXALLPROP);
-	BeginBatchDraw();
+	EasyPX::initgraph(900, 900, EasyPX::EW_HASMAXIMIZI | EasyPX::EW_HASSIZEBOX);
 	setbkcolor(WHITE);
 	setlinestyle(PS_SOLID, 1);
 	settextcolor(BLACK);
@@ -68,7 +67,6 @@ int main()
 
 	infoBox.showInfo("grid", false);
 	infoBox.showInfo("fpsWarn", false);
-
 	infoBox.setInfoColor("grid", RED);
 	infoBox.setInfoColor("fpsWarn", RED);
 
@@ -97,6 +95,7 @@ int main()
 	infoBox.x = 10;
 	infoBox.y = 10;
 
+	BeginBatchDraw();
 	FlushMouseMsgBuffer();
 	while (LimDevice::OnlineDeviceNumber > 0)
 	{
@@ -269,14 +268,40 @@ int main()
 			if (bIfGrid)
 			{
 				setlinecolor(0XB4A8A8);
-				for (int i = 0; i < 100; i++)
+				constexpr int gridSize = 1000;
+				for (int i = 0; i <= 10000 / gridSize; i++)
 				{
-					for (int j = 0; j < 100; j++)
+					for (int j = 0; j <= 10000 / gridSize; j++)
 					{
-						line(-i * 100, -j * 100, i * 100, -j * 100);
-						line(-i * 100, j * 100, i * 100, j * 100);
-						line(-i * 100, -j * 100, -i * 100, j * 100);
-						line(i * 100, -j * 100, i * 100, j * 100);
+						line(-i * gridSize, -j * gridSize, i * gridSize, -j * gridSize);
+						line(-i * gridSize, j * gridSize, i * gridSize, j * gridSize);
+						line(-i * gridSize, -j * gridSize, -i * gridSize, j * gridSize);
+						line(i * gridSize, -j * gridSize, i * gridSize, j * gridSize);
+					}
+				}
+				constexpr int smallGridSize = 100;
+				constexpr int smallAreaSize = 1000;
+				for (int i = 0; i <= smallAreaSize / smallGridSize; i++)
+				{
+					for (int j = 0; j <= smallAreaSize / smallGridSize; j++)
+					{
+						line(-i * smallGridSize, -j * smallGridSize, i * smallGridSize, -j * smallGridSize);
+						line(-i * smallGridSize, j * smallGridSize, i * smallGridSize, j * smallGridSize);
+						line(-i * smallGridSize, -j * smallGridSize, -i * smallGridSize, j * smallGridSize);
+						line(i * smallGridSize, -j * smallGridSize, i * smallGridSize, j * smallGridSize);
+					}
+				}
+
+				constexpr int littleGridSize = 10;
+				constexpr int littleAreaSize = 100;
+				for (int i = 0; i <= littleAreaSize / littleGridSize; i++)
+				{
+					for (int j = 0; j <= littleAreaSize / littleGridSize; j++)
+					{
+						line(-i * littleGridSize, -j * littleGridSize, i * littleGridSize, -j * littleGridSize);
+						line(-i * littleGridSize, j * littleGridSize, i * littleGridSize, j * littleGridSize);
+						line(-i * littleGridSize, -j * littleGridSize, -i * littleGridSize, j * littleGridSize);
+						line(i * littleGridSize, -j * littleGridSize, i * littleGridSize, j * littleGridSize);
 					}
 				}
 			}
@@ -389,11 +414,9 @@ int main()
 				setaspectratio(scale, scale);
 				setorigin(originPos.x, originPos.y);
 			}
-
 		}
 
 		FlushBatchDraw();
-
 		using namespace std::chrono;
 		std::this_thread::sleep_for(5ms);
 	}
