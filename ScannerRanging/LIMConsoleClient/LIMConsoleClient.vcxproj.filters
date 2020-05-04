@@ -30,20 +30,11 @@
     <ClInclude Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.h">
       <Filter>Library\EquipmentComm</Filter>
     </ClInclude>
-    <ClInclude Include="..\LidarDataPackage\LidarDataPackage.h">
-      <Filter>Library\LidarDataPackage</Filter>
-    </ClInclude>
     <ClInclude Include="..\LidarDataPackage\LimDevice.h">
       <Filter>Library\LidarDataPackage</Filter>
     </ClInclude>
     <ClInclude Include="..\LidarDataPackage\LIM\lim.h">
       <Filter>Library\LIM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\LidarDataPackage\fps.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\LidarDataPackage\EasyPX.h">
-      <Filter>Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +48,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\LidarDataPackage\LidarDataPackage.cpp">
-      <Filter>Library\LidarDataPackage</Filter>
-    </ClCompile>
     <ClCompile Include="..\LidarDataPackage\LIM\lim.cpp">
       <Filter>Library\LIM</Filter>
     </ClCompile>

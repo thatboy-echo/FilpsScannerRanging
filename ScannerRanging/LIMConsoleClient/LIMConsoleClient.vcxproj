@@ -140,15 +140,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\LidarDataPackage\EasyPX.h" />
     <ClInclude Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.h" />
-    <ClInclude Include="..\LidarDataPackage\fps.h" />
-    <ClInclude Include="..\LidarDataPackage\LidarDataPackage.h" />
     <ClInclude Include="..\LidarDataPackage\LimDevice.h" />
     <ClInclude Include="..\LidarDataPackage\LIM\lim.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\LidarDataPackage\LidarDataPackage.cpp" />
     <ClCompile Include="..\LidarDataPackage\LIM\lim.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

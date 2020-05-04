@@ -30,9 +30,6 @@
     <ClCompile Include="LIM\lim.cpp">
       <Filter>Library\LIM</Filter>
     </ClCompile>
-    <ClCompile Include="LidarDataPackage.cpp">
-      <Filter>Library\LidarDataPackage</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
     </ClInclude>
     <ClInclude Include="EquipmentComm\EquipmentComm.h">
       <Filter>Library\EquipmentComm</Filter>
-    </ClInclude>
-    <ClInclude Include="LidarDataPackage.h">
-      <Filter>Library\LidarDataPackage</Filter>
     </ClInclude>
     <ClInclude Include="LimDevice.h">
       <Filter>Library\LidarDataPackage</Filter>

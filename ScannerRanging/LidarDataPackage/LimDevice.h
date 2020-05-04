@@ -22,8 +22,8 @@ struct LimDevice
 #	endif
 #else
 	using tstring = std::string;
-#	ifndef to_string
-#	define to_string std::to_string
+#	ifndef to_tstring
+#	define to_tstring std::to_string
 #	endif
 #endif // UNICODE
 
@@ -52,8 +52,11 @@ public:
 	std::vector<POINT> drawPolyCoord;
 	std::vector<PolarCoord> polarCoord;
 	std::vector<RectaCoord> rectaCoord;
+	std::vector<RectaCoord> yPriorCoord;	// Y方向优先排列
+	std::vector<RectaCoord> yInterpolationCoord;// Y方向插值
 	std::vector<std::vector<RectaCoord>> borderStore;
 
+	static constexpr double MaxLength = 5000.;
 	inline static std::mutex staticDataLock;
 	inline static int OnlineDeviceNumber = 0;
 	inline static int SerialCID = 0x80;
@@ -81,7 +84,7 @@ public:
 		++SerialCID;
 		staticDataLock.unlock();
 	}
-	static void WaitFirstDeviceConnected()
+	static void WaitFirstDeviceTryConnected()
 	{
 		using namespace std::chrono;
 		while (!hasDeviceTryConnected)
@@ -107,27 +110,102 @@ protected:
 
 	void calcRectaCoord()
 	{
-		size_t indexWrite = 0;
-		for (size_t indexRead = 0; indexRead < polarCoord.size(); indexRead++)
+		rectaCoord.clear();
+		drawPolyCoord.clear();
+		drawPolyCoord.push_back(POINT());
+		yPriorCoord.clear();
+		for (auto& [length, angle] : polarCoord)
 		{
-			if (polarCoord[indexRead].length > 900)
+			if (length > MaxLength)
 				continue;
-			if (indexWrite >= rectaCoord.size())
-			{
-				rectaCoord.resize(indexWrite + 1);
-				drawPolyCoord.resize(indexWrite + 2);
-			}
-			rectaCoord[indexWrite].x = polarCoord[indexRead].length * cos(polarCoord[indexRead].angle / 180 * pi);
-			rectaCoord[indexWrite].y = polarCoord[indexRead].length * sin(polarCoord[indexRead].angle / 180 * pi);
-			drawPolyCoord[indexWrite + 1].x = rectaCoord[indexWrite].x;
-			drawPolyCoord[indexWrite + 1].y = -rectaCoord[indexWrite].y;
-			indexWrite++;
+			rectaCoord.push_back(RectaCoord{ length * cos(angle / 180 * pi),length * sin(angle / 180 * pi) });
+			drawPolyCoord.push_back(POINT({ (long)rectaCoord.back().x , (long)-rectaCoord.back().y }));
 		}
-		if (rectaCoord.size() != indexWrite || drawPolyCoord.size() != indexWrite + 1)
+
+		if (!rectaCoord.empty())
 		{
-			rectaCoord.resize(indexWrite);
-			drawPolyCoord.resize(indexWrite + 1);
+			yPriorCoord.push_back(*(rectaCoord.begin() + rectaCoord.size() / 2));
+
+			// >0
+			int lastX = yPriorCoord.front().x;
+			for (auto it = rectaCoord.rbegin() + rectaCoord.size() / 2; it != rectaCoord.rend(); it++)
+			{
+				if (it->x <= lastX)
+					continue;
+				yPriorCoord.push_back(*it);
+				lastX = yPriorCoord.back().x;
+			}
+			lastX = lastX = yPriorCoord.front().x;
+			for (auto it = rectaCoord.begin() + rectaCoord.size() / 2 ; it != rectaCoord.end(); it++)
+			{
+				if (it->x >= lastX)
+					continue;
+				yPriorCoord.push_back(*it);
+				lastX = yPriorCoord.back().x;
+			}
+
+			std::sort(yPriorCoord.begin(), yPriorCoord.end(), [](const RectaCoord& a, const RectaCoord& b) {return a.x > b.x; });
 		}
+
+
+		yInterpolationCoord.clear();
+
+		auto beginX = static_cast<int>(yPriorCoord.front().x * 10) / 10.;
+		auto endX = static_cast<int>(yPriorCoord.back().x * 10) / 10.;
+
+		auto searchRBegin = yPriorCoord.rbegin();
+		auto rbigger = yPriorCoord.rbegin();
+		auto rlittle = yPriorCoord.rbegin();
+		for (auto x = 90.0; x <= beginX; x += 0.1)
+		{
+			// find first larger than x
+			for (; searchRBegin != yPriorCoord.rend(); ++searchRBegin)
+			{
+				if (searchRBegin->x > x)
+					break;
+			}
+			if (searchRBegin == yPriorCoord.rend())
+				searchRBegin = yPriorCoord.rend() - 1;
+			rbigger = searchRBegin;
+			rlittle = searchRBegin == yPriorCoord.rbegin() ? yPriorCoord.rbegin() : searchRBegin - 1;
+
+			double y;
+
+			if (rbigger->x == rlittle->x)
+				y = rlittle->y;
+			else
+				y = ((rbigger->x - x) * rlittle->y + (x - rlittle->x) * rbigger->y) / (rbigger->x - rlittle->x);
+
+			yInterpolationCoord.push_back(RectaCoord{ x,y });
+		}
+		auto searchBegin = yPriorCoord.begin();
+		auto bigger = yPriorCoord.begin();
+		auto little = yPriorCoord.begin();
+		for (auto x = 90.0; x >= endX; x -= 0.1)
+		{
+			// find first smaller than x
+			for (; searchBegin != yPriorCoord.end(); ++searchBegin)
+			{
+				if (searchBegin->x < x)
+					break;
+			}
+			if (searchBegin == yPriorCoord.end())
+				searchBegin = yPriorCoord.end() - 1;
+			little = searchBegin;
+			bigger = searchBegin == yPriorCoord.begin() ? yPriorCoord.begin() : searchBegin - 1;
+
+			double y;
+
+			if (bigger->x == little->x)
+				y = bigger->y;
+			else
+				y = ((bigger->x - x) * little->y + (x - little->x) * bigger->y) / (bigger->x - little->x);
+
+			yInterpolationCoord.push_back(RectaCoord{ x,y });
+		}
+
+		std::sort(yInterpolationCoord.begin(), yInterpolationCoord.end(), [](const RectaCoord& a, const RectaCoord& b) {return a.x < b.x; });
+
 		// Border
 		double borderContinusLen2 = borderContinusLen * borderContinusLen;
 		borderStore.clear();
@@ -191,6 +269,7 @@ protected:
 				isConnected = false;
 			}
 			CloseEquipmentComm(cid);
+			isTryConnected = false;
 		}
 	}
 public:

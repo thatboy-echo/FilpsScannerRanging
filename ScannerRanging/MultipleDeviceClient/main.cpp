@@ -2,10 +2,33 @@
 
 #include <httplib.h>
 #include <json.hpp>
-#include "../LidarDataPackage/LimDevice.h"
 #include <sstream>
 #include <iomanip>
 #include <conio.h>
+#include "../LidarDataPackage/LimDevice.h"
+
+#ifdef _DEBUG
+
+
+#include <iostream>
+void log()
+{
+	std::cout << std::endl;
+}
+
+
+template<typename T, typename ...Types>
+void log(T v, Types... args)
+{
+	std::cout << v << ' ';
+	log(args...);
+}
+
+#else
+#define log
+#endif // _DEBUG
+
+
 
 using json = nlohmann::json;
 using Server = httplib::Server;
@@ -37,7 +60,7 @@ void getPosition(const Request& req, Response& res)
 	param["cid"] = cid;
 
 	auto& device = LimDevice::DeviceList[cid];
-	param["triconnected"] = device.isTryConnected;
+	param["try_connected"] = device.isTryConnected;
 	param["online"] = device.isConnected.operator bool();
 	param["ip"] = device.deviceIP;
 	if (!device.isConnected)
@@ -55,20 +78,73 @@ void getPosition(const Request& req, Response& res)
 		{
 			auto type = req.get_param_value("type", i);
 
-			if (!type.compare(0, 5, "polar", 5))
+
+			// 反向高度坐标(插值）
+			if (!type.compare(0, 13, "interpolation_coord", 13))
 			{
-				param["type"].push_back("polar");
+				param["types"].push_back("interpolation_coord");
+
+				if (!device.yPriorCoord.empty())
+				{
+					device.LockCoord();
+
+					for (auto& [x, y] : device.yInterpolationCoord)
+					{
+						param["interpolation_coord"]["x"].push_back(x);
+						param["interpolation_coord"]["y"].push_back(y);
+					}
+					device.UnlockCoord();
+				}
+			}
+			// 线段
+			else if (!type.compare(0, 7, "borders", 7))
+			{
+				param["types"].push_back("borders");
+				device.LockCoord();
+
+				for (auto& line : device.borderStore)
+				{
+					param["borders"].push_back(json());
+					auto& thisBorder = param["borders"].back();
+					for (auto& [x, y] : line)
+					{
+						thisBorder["x"].push_back(x);
+						thisBorder["y"].push_back(y);
+					}
+				}
+
+				device.UnlockCoord();
+			}
+			// 过滤极坐标
+			else if (!type.compare(0, 5, "polar_coord", 5))
+			{
+				param["types"].push_back("polar_coord");
 				device.LockCoord();
 				for (auto& [length, angle] : device.polarCoord)
 				{
+					if (length > LimDevice::MaxLength)
+						continue;
 					param["polar_coord"]["length"].push_back(length);
 					param["polar_coord"]["angle"].push_back(angle);
 				}
 				device.UnlockCoord();
 			}
-			else if (!type.compare(0, 5, "recta", 5))
+			// 原始极坐标
+			else if (!type.compare(0, 5, "orign_coord", 5))
 			{
-				param["types"].push_back("recta");
+				param["types"].push_back("orign_coord");
+				device.LockCoord();
+				for (auto& [length, angle] : device.polarCoord)
+				{
+					param["orign_coord"]["length"].push_back(length);
+					param["orign_coord"]["angle"].push_back(angle);
+				}
+				device.UnlockCoord();
+			}
+			// 直角坐标
+			else if (!type.compare(0, 5, "recta_coord", 5))
+			{
+				param["types"].push_back("recta_coord");
 				device.LockCoord();
 				for (auto& [x, y] : device.rectaCoord)
 				{
@@ -90,11 +166,21 @@ void connectDevice(const Request& req, Response& res)
 {
 	if (!req.has_param("ip"))
 	{
-		res.set_content("error:Invalid parameter: IP"_json.dump(), "text/json");
+		res.set_content("{\"error\": \"Invalid parameter IP\"}"_json.dump(), "text/json");
 		return;
 	}
+	auto ip = req.get_param_value("ip");
 
-	LimDevice::OpenEquipment(req.get_param_value("ip").c_str()/*"192.168.1.210"*/);
+	for (auto& device : LimDevice::DeviceList)
+	{
+		if (device.second.deviceIP == ip && device.second.isConnected)
+		{
+			res.set_content("{\"error\": \"Device is online\"}"_json.dump(), "text/json");
+			return;
+		}
+	}
+
+	LimDevice::OpenEquipment(ip.c_str()/*"192.168.1.210"*/);
 	LimDevice::WaitFirstDeviceTryConnected();
 	LimDevice::StartLMDData();
 
@@ -117,7 +203,7 @@ void getDeviceInfo(const Request& req, Response& res)
 		{
 			deviceListParam["cid"] = cid;
 			deviceListParam["ip"] = device.deviceIP;
-			deviceListParam["online"] = device.isConnected ? "true" : "false";
+			deviceListParam["online"] = device.isConnected.operator bool();
 			param["device_list"].push_back(deviceListParam);
 		}
 	}
@@ -126,7 +212,6 @@ void getDeviceInfo(const Request& req, Response& res)
 
 int main()
 {
-	FreeConsole();
 	LimDevice::InitEquipment();
 
 	server.bind_to_port("localhost", limServerPort);
@@ -136,7 +221,7 @@ int main()
 	server.Get("/lidar/position", getPosition);
 	server.Get("/lidar/connect", connectDevice);
 	server.Get("/lidar/info", getDeviceInfo);
-	server.Get("/quit", [](const Request&, Response&){server.stop();});
+	server.Get("/quit", [](const Request&, Response&) {server.stop(); });
 
 
 	server.listen_after_bind();

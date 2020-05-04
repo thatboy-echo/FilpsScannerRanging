@@ -1,9 +1,7 @@
-#include <httplib.h>
 
 #include "../LidarDataPackage/LimDevice.h"
 #include "../LidarDataPackage/fps.h"
 #include "../LidarDataPackage/EasyPX.h"
-
 #include <conio.h>
 
 
@@ -12,7 +10,7 @@ int main()
 	using namespace thatboy;
 	LimDevice::InitEquipment();
 	LimDevice::OpenEquipment("192.168.1.210");
-	LimDevice::WaitFirstDeviceConnected();
+	LimDevice::WaitFirstDeviceTryConnected();
 	LimDevice::StartLMDData();
 
 	EasyPX::initgraph(900, 900, EasyPX::EW_HASMAXIMIZI | EasyPX::EW_HASSIZEBOX);
@@ -89,7 +87,7 @@ int main()
 	infoBox.setArgColor("M", GREEN);
 
 	auto& device = LimDevice::DeviceList.begin()->second;
-	infoBox.setArg("Angle", to_string((int)device.angleBeg) + '~' + to_string((int)device.angleEnd));
+	infoBox.setArg("Angle", to_tstring((int)device.angleBeg) + '~' + to_tstring((int)device.angleEnd));
 	infoBox.setArg("Len", device.borderContinusLen);
 
 	infoBox.x = 10;
@@ -321,12 +319,32 @@ int main()
 				solidpolygon(device.drawPolyCoord.data(), device.drawPolyCoord.size());
 			if (bIfLine)
 			{
-				for (const auto& border : device.borderStore)
+				setlinestyle(PS_SOLID, 1);
+				setlinecolor(GREEN);
+				if (!device.yInterpolationCoord.empty())
 				{
-					moveto(border.front().x, -border.front().y);
-					for (const auto& pt : border)
-						lineto(pt.x, -pt.y);
+					moveto(device.yInterpolationCoord.front().x, -device.yInterpolationCoord.front().y);
+					for (auto& [x, y] : device.yInterpolationCoord)
+					{
+						lineto(x, -y);
+					}
 				}
+
+				setlinecolor(YELLOW);
+				if (!device.yPriorCoord.empty())
+				{
+					circle(device.yPriorCoord.front().x, -device.yPriorCoord.front().y,2);
+					for (auto& [x, y] : device.yPriorCoord)
+					{
+						circle(x, -y,2);
+					}
+				}
+				//for (const auto& border : device.borderStore)
+				//{
+				//	moveto(border.front().x, -border.front().y);
+				//	for (const auto& pt : border)
+				//		lineto(pt.x, -pt.y);
+				//}
 			}
 		}
 		// ÖÐÐÄµã
@@ -334,7 +352,7 @@ int main()
 		solidcircle(0, 0, 3);
 		if (bIfPoint)
 		{
-			setfillcolor(RGB(0, 0, 0X80));
+			setfillcolor(RED);// RGB(0, 0, 0X80));
 			for (const auto& pt : device.rectaCoord)
 				solidcircle(pt.x, -pt.y, 1);
 		}
@@ -376,23 +394,11 @@ int main()
 				infoBox.showInfo("grid", true);
 				shutDownGridnfoFrameCount = 500;
 			}
-			if (shutDownGridnfoFrameCount > 0)
-			{
-				--shutDownGridnfoFrameCount;
-				if (shutDownGridnfoFrameCount == 1)
-					infoBox.showInfo("grid", false);
-			}
+			if (shutDownGridnfoFrameCount > 0 && --shutDownGridnfoFrameCount == 1)
+				infoBox.showInfo("grid", false);
 			else
-			{
-				if (fps < 20)
-				{
-					infoBox.showInfo("fpsWarn", true);
-				}
-				else
-				{
-					infoBox.showInfo("fpsWarn", false);
-				}
-			}
+				infoBox.showInfo("fpsWarn", fps < 20);
+
 			if (bIfFixed)
 				infoBox.drawInfo(infoBox.x - originPos.x, infoBox.y - originPos.y);
 			else
@@ -408,9 +414,9 @@ int main()
 				setlinestyle(PS_SOLID, 3);
 				setlinecolor(YELLOW);
 				line(mousePos.x, mousePos.y, Msg.x, Msg.y);
-				outtextxy((Msg.x + mousePos.x) / 2, (Msg.y + mousePos.y) / 2, (to_string(sqrt((Msg.x - mousePos.x) * (Msg.x - mousePos.x) + (Msg.y - mousePos.y) * (Msg.y - mousePos.y)) / scale / 100) + LimDevice::tstring(TEXT("m"))).c_str());
-				outtextxy((Msg.x + originPos.x) / 2, (Msg.y + originPos.y) / 2, (to_string(sqrt((Msg.x - originPos.x) * (Msg.x - originPos.x) + (Msg.y - originPos.y) * (Msg.y - originPos.y)) / scale / 100) + LimDevice::tstring(TEXT("m"))).c_str());
-				outtextxy(Msg.x, Msg.y + 30, (to_string(atan2(Msg.y - originPos.y, -Msg.x + originPos.x) * 180 / LimDevice::pi + 180) + LimDevice::tstring(TEXT("¡ã"))).c_str());
+				outtextxy((Msg.x + mousePos.x) / 2, (Msg.y + mousePos.y) / 2, (to_tstring(sqrt((Msg.x - mousePos.x) * (Msg.x - mousePos.x) + (Msg.y - mousePos.y) * (Msg.y - mousePos.y)) / scale / 100) + LimDevice::tstring(TEXT("m"))).c_str());
+				outtextxy((Msg.x + originPos.x) / 2, (Msg.y + originPos.y) / 2, (to_tstring(sqrt((Msg.x - originPos.x) * (Msg.x - originPos.x) + (Msg.y - originPos.y) * (Msg.y - originPos.y)) / scale / 100) + LimDevice::tstring(TEXT("m"))).c_str());
+				outtextxy(Msg.x, Msg.y + 30, (to_tstring(atan2(Msg.y - originPos.y, -Msg.x + originPos.x) * 180 / LimDevice::pi + 180) + LimDevice::tstring(TEXT("¡ã"))).c_str());
 				setaspectratio(scale, scale);
 				setorigin(originPos.x, originPos.y);
 			}

@@ -2,7 +2,7 @@
 #define __EQUIPMENTCOMMDLL_H__
 
 #include <WINDOWS.H>
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef EQUIPMENTDLL
 #define EQUIPMENTCOMM_DLL_API extern "C" __declspec(dllexport)
