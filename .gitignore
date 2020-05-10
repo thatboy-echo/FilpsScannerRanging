@@ -20,3 +20,7 @@ desktop.ini
 /ScannerRanging/LIMConsoleClient/Release
 /ScannerRanging/MultipleDeviceClient/Debug
 /ScannerRanging/MultipleDeviceClient/Release
+/ScannerRanging/Draw/Debug
+/ScannerRanging/Draw/Release
+/ScannerRanging/VirtualPostClient/Debug
+/ScannerRanging/VirtualPostClient/Release

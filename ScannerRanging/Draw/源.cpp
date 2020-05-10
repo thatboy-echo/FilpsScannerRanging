@@ -3,26 +3,33 @@
 #include <sstream>
 #include <iomanip>
 #include <conio.h>
-#include "LimDevice.h"
-
-//#define TEST
-
-#ifdef TEST
-#include "../LidarDataPackage/EasyPX.h"
 #include "../LidarDataPackage/fps.h"
-#include <conio.h>
+#include "../LidarDataPackage/EasyPX.h"
+
+
+using namespace nlohmann;
+using namespace std;
+using namespace httplib;
+using namespace thatboy;
+
+Client client("localhost", 5056);
+map<int, int> points;
+
+void writePoints()
+{
+	auto res = client.Get("/height?cid=128");
+	json c;
+	if (res)
+		c = json::parse(res->body);
+	auto height = c["h"];
+	points.clear();
+	int x = c["begin"].get<int>();
+	for (auto& p : height)
+		points[x++] = p.get<int>();
+}
 
 int main()
 {
-	using namespace nlohmann;
-	using namespace std;
-	using namespace httplib;
-	using namespace thatboy;
-	LimDevice::InitEquipment();
-	LimDevice::OpenEquipment("192.168.1.210");
-	LimDevice::WaitFirstDeviceTryConnected();
-	LimDevice::StartLMDData();
-
 	EasyPX::initgraph(900, 900, EasyPX::EW_HASMAXIMIZI | EasyPX::EW_HASSIZEBOX);
 	setbkcolor(WHITE);
 	setlinestyle(PS_SOLID, 1);
@@ -31,8 +38,8 @@ int main()
 
 	bool bIfLine = true;
 	bool bIfPoint = true;
-	bool bIfBg = false;//
-	bool bIfInfo = false;//
+	bool bIfBg = true;
+	bool bIfInfo = true;
 	bool bIfMeasure = true;
 	bool bIfGrid = true;
 	bool bIfArea = true;
@@ -103,6 +110,7 @@ int main()
 	FlushMouseMsgBuffer();
 	while (true)
 	{
+		writePoints();
 		if (MouseHit())
 		{
 			bool bIfOriChanged = false;
@@ -112,30 +120,30 @@ int main()
 				Msg = GetMouseMsg();
 				if (Msg.wheel != 0)
 				{
-
-					while (Msg.wheel > 0)
-					{
-						scale *= 1.1;
-						Msg.wheel -= 120;
-						if (scale > 400)
+				
+						while (Msg.wheel > 0)
 						{
-							Msg.wheel = 0;
-							scale = 400;
+							scale *= 1.1;
+							Msg.wheel -= 120;
+							if (scale > 400)
+							{
+								Msg.wheel = 0;
+								scale = 400;
+							}
 						}
-					}
-					while (Msg.wheel < 0)
-					{
-						scale *= 0.9;
-						Msg.wheel += 120;
-						if (scale < 0.000125)
+						while (Msg.wheel < 0)
 						{
-							Msg.wheel = 0;
-							scale = 0.000125;
+							scale *= 0.9;
+							Msg.wheel += 120;
+							if (scale < 0.000125)
+							{
+								Msg.wheel = 0;
+								scale = 0.000125;
+							}
 						}
-					}
-					bIfScaleChanged = true;
-					bIfOriChanged = true;
-
+						bIfScaleChanged = true;
+						bIfOriChanged = true;
+					
 				}
 				if (Msg.uMsg == WM_LBUTTONDOWN || Msg.uMsg == WM_RBUTTONDOWN)
 				{
@@ -305,26 +313,12 @@ int main()
 
 		if (bIfArea || bIfLine)
 		{
-			if (!LimDevice::DeviceList.empty())
+			setlinecolor(0X00F000);
+			setfillcolor(0XF37E31);
+			if (!points.empty())
 			{
-				auto& device = LimDevice::DeviceList.begin()->second;
-				device.LockCoord();
-				if (!device.negHeightCoord.empty())
-				{
-					setlinecolor(0X00F000);
-					setfillcolor(0XF37E31);
-					for (auto& [x, y] : device.negHeightCoord)
-						line(x, 0, x, -y);
-				}
-				if (!device.negHeightCoord.empty())
-				{
-					setlinecolor(0X00F0F0);
-					setfillcolor(0XF37E31);
-					for (auto& [x, y] : device.rectaCoord)
-						circle(x, -y, 1);
-				}
-
-				device.UnlockCoord();
+				for (auto& [x, y] : points)
+					line(x, y, x, 400);
 			}
 		}
 		// 中心点
@@ -367,212 +361,3 @@ closeJmp:
 	closegraph();
 	return 0;
 }
-
-#else
-
-using json = nlohmann::json;
-using Server = httplib::Server;
-using Request = httplib::Request;
-using Response = httplib::Response;
-
-constexpr int limServerPort = 5056;
-Server server;
-
-void getDistance(const Request& req, Response& res);
-void getHeight(const Request& req, Response& res);
-void getCoord(const Request& req, Response& res);
-void getInfo(const Request& req, Response& res);
-void getConnect(const Request& req, Response& res);
-void getDisconnect(const Request& req, Response& res);
-
-int main()
-{
-	LimDevice::InitEquipment();
-
-	server.bind_to_port("192.168.152.1", limServerPort);
-	server.set_mount_point("/", ".");
-
-	server.Get("/distance", getDistance);
-	server.Get("/height", getHeight);
-	server.Get("/coord", getCoord);
-	server.Get("/info", getInfo);
-	server.Get("/connect", getConnect);
-	server.Get("/disconnect", getDisconnect);
-
-	server.Get("/shutdown", [](const Request&, Response&) {server.stop(); });
-	server.Get("/quit", [](const Request&, Response&) {server.stop(); });
-
-	server.listen_after_bind();
-	return 0;
-}
-
-#pragma region 验证参数宏
-
-#define VERIFY_NO_ARGV_1(_param) \
-	json body;\
-	if (!req.has_param(#_param))\
-	{\
-		body["error"] = "Invalid parameter: no"## #_param ##"given.";\
-		res.set_content(body.dump(), "application/json");\
-		return;\
-	}
-#define VERIFY_NO_ARGV_2(_param1, _param2) \
-	json body;\
-	if (!req.has_param(#_param1) || !req.has_param(#_param2))\
-	{\
-		body["error"] = "Invalid parameter: no"## #_param1 ##"or"## #_param2 ##"given.";\
-		res.set_content(body.dump(), "application/json");\
-		return;\
-	}
-#define VERIFY_NO_DEVICE_END \
-	body["info"] = "Device is not online ";\
-	body["cid"] = dstCid;\
-	res.set_content(body.dump(), "application/json");
-
-#pragma endregion
-
-template<typename T>
-std::string fmtString(T in, int width = 0, int prec = 0) {
-	std::ostringstream s;
-	s << std::setw(width) << std::setprecision(prec) << in;
-	return s.str();
-}
-
-void getDistance(const Request& req, Response& res)
-{
-	VERIFY_NO_ARGV_2(cid, angle);
-	int dstCid = std::stoi(req.get_param_value("cid"));
-	double dstAngle = std::stod(req.get_param_value("angle"));
-
-	for (auto& [cid, device] : LimDevice::DeviceList)
-	{
-		if (cid == dstCid)
-		{
-			body["cid"] = cid;
-			body["angle"] = dstAngle;
-			int ptr = std::lround((dstAngle - device.angleBeg) * 2);
-			if (ptr >= 0 && ptr < device.polarCoord.size())
-				body["length"] = device.polarCoord[ptr].length;
-			else
-				body["length"] = -1;
-			return res.set_content(body.dump(), "application/json");
-		}
-	}
-	VERIFY_NO_DEVICE_END;
-}
-
-void getHeight(const Request& req, Response& res)
-{
-	VERIFY_NO_ARGV_1(cid);
-	int dstCid = std::stoi(req.get_param_value("cid"));
-	for (auto& [cid, device] : LimDevice::DeviceList)
-	{
-		if (cid == dstCid)
-		{
-			device.LockCoord();
-			if (device.negHeightCoord.empty())
-			{
-				body["error"] = "coord empty!";
-				return res.set_content(body.dump(4), "application/json");
-			}
-			body["cid"] = cid;
-			body["intime"] = std::chrono::system_clock::now().time_since_epoch().count();
-			body["begin"] = device.negHeightCoord.front().x;
-			body["end"] = device.negHeightCoord.back().x;
-			for (auto& [x, y] : device.negHeightCoord)
-				body["h"].push_back(y);
-			device.UnlockCoord();
-			return res.set_content(body.dump(), "application/json");
-		}
-	}
-	VERIFY_NO_DEVICE_END;
-}
-
-void getCoord(const Request& req, Response& res)
-{
-	VERIFY_NO_ARGV_1(cid);
-	int dstCid = std::stoi(req.get_param_value("cid"));
-	for (auto& [cid, device] : LimDevice::DeviceList)
-	{
-		if (cid == dstCid)
-		{
-			device.LockCoord();
-			if (device.rectaCoord.empty())
-			{
-				body["error"] = "coord empty!";
-				return res.set_content(body.dump(4), "application/json");
-			}
-			body["cid"] = cid;
-			for (auto& [x, y] : device.rectaCoord)
-			{
-				json p;
-				p["y"] = x;
-				p["h"] = y;
-				body["coord"].push_back(p);
-			}
-			device.UnlockCoord();
-			return res.set_content(body.dump(4), "application/json");
-		}
-	}
-	VERIFY_NO_DEVICE_END;
-}
-
-void getInfo(const Request& req, Response& res)
-{
-	json param;
-	if (req.has_param("online_number"))
-		param["online_number"] = LimDevice::OnlineDeviceNumber;
-	if (req.has_param("device_list"))
-	{
-		json deviceListParam;
-		for (auto& [cid, device] : LimDevice::DeviceList)
-		{
-			deviceListParam["cid"] = cid;
-			deviceListParam["ip"] = device.deviceIP;
-			deviceListParam["online"] = device.isConnected.operator bool();
-			param["device_list"].push_back(deviceListParam);
-		}
-	}
-	res.set_content(param.dump(), "application/json");
-}
-
-void getConnect(const Request& req, Response& res)
-{
-	VERIFY_NO_ARGV_1(ip);
-	auto ip = req.get_param_value("ip");
-
-	for (auto& [cid, device] : LimDevice::DeviceList)
-		if (device.deviceIP == ip && device.isConnected)
-		{
-			body["cid"] = cid;
-			body["info"] = "Device is online " + ip;
-			return res.set_content(body.dump(), "application/json");
-		}
-
-	auto cid = LimDevice::OpenEquipment(ip.c_str()/*"192.168.1.210"*/);
-	LimDevice::WaitFirstDeviceTryConnected();
-	LimDevice::StartLMDData();
-
-	body["info"] = "Tried to connect device " + req.get_param_value("ip");
-	body["cid"] = cid;
-	res.set_content(body.dump(), "application/json");
-}
-
-void getDisconnect(const Request& req, Response& res)
-{
-	VERIFY_NO_ARGV_1(cid);
-	int dstCid = std::stoi(req.get_param_value("cid"));
-	for (auto& [cid, device] : LimDevice::DeviceList)
-	{
-		if (cid == dstCid && device.isConnected)
-		{
-			body["cid"] = cid;
-			body["info"] = "Device is disconnecting " + device.deviceIP;
-			LimDevice::DeviceList.erase(cid);
-			return res.set_content(body.dump(), "application/json");
-		}
-	}
-	VERIFY_NO_DEVICE_END;
-}
-
-#endif // TEST

@@ -18,18 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\MultipleDeviceClient\LimDevice.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
     <ClCompile Include="..\LidarDataPackage\LIM\lim.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="LimDevice.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.dll">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="..\..\lidar.md" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.lib">
@@ -37,8 +31,8 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LimDevice.h">
+    <None Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.dll">
       <Filter>头文件</Filter>
-    </ClInclude>
+    </None>
   </ItemGroup>
 </Project>

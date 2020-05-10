@@ -15,30 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="源.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\LidarDataPackage\LIM\lim.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="LimDevice.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.dll">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="..\..\lidar.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.lib">
-      <Filter>头文件</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="LimDevice.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

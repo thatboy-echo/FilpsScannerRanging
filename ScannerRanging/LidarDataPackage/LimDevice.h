@@ -46,15 +46,15 @@ public:
 	std::string deviceIP;
 	double angleBeg = -45;
 	double angleEnd = 225;
-	double borderContinusLen = 100;
-	size_t BorderLeastNumber = 3;
+	double lineContinusLen = 100;
+	size_t lineLeastNumber = 3;
 
 	std::vector<POINT> drawPolyCoord;
 	std::vector<PolarCoord> polarCoord;
 	std::vector<RectaCoord> rectaCoord;
 	std::vector<RectaCoord> yPriorCoord;	// Y方向优先排列
-	std::vector<RectaCoord> yInterpolationCoord;// Y方向插值
-	std::vector<std::vector<RectaCoord>> borderStore;
+	std::vector<RectaCoord> negHeightCoord;// Y方向插值
+	std::vector<std::vector<RectaCoord>> lineStore;
 
 	static constexpr double MaxLength = 5000.;
 	inline static std::mutex staticDataLock;
@@ -65,8 +65,8 @@ public:
 
 	void LockCoord() { coordLock.lock(); }
 	void UnlockCoord() { coordLock.unlock(); }
-	void SetBorderContinusLen(double len) { borderContinusLen = len; }
-	void SetBorderLeastNumber(size_t num) { BorderLeastNumber = num; }
+	void SetLineContinusLen(double len) { lineContinusLen = len; }
+	void SetLineLeastNumber(size_t num) { lineLeastNumber = num; }
 
 	~LimDevice()
 	{
@@ -109,7 +109,7 @@ protected:
 	std::mutex coordLock;
 	int cid = 0XFFFFFFF;
 
-	void calcRectaCoord()
+	void processCoord()
 	{
 		rectaCoord.clear();
 		drawPolyCoord.clear();
@@ -149,7 +149,7 @@ protected:
 		}
 
 
-		yInterpolationCoord.clear();
+		negHeightCoord.clear();
 
 		auto beginX = static_cast<int>(yPriorCoord.front().x * 10) / 10.;
 		auto endX = static_cast<int>(yPriorCoord.back().x * 10) / 10.;
@@ -177,7 +177,7 @@ protected:
 			else
 				y = ((rbigger->x - x) * rlittle->y + (x - rlittle->x) * rbigger->y) / (rbigger->x - rlittle->x);
 
-			yInterpolationCoord.push_back(RectaCoord{ x,y });
+			negHeightCoord.push_back(RectaCoord{ x,y });
 		}
 		auto searchBegin = yPriorCoord.begin();
 		auto bigger = yPriorCoord.begin();
@@ -202,14 +202,14 @@ protected:
 			else
 				y = ((bigger->x - x) * little->y + (x - little->x) * bigger->y) / (bigger->x - little->x);
 
-			yInterpolationCoord.push_back(RectaCoord{ x,y });
+			negHeightCoord.push_back(RectaCoord{ x,y });
 		}
 
-		std::sort(yInterpolationCoord.begin(), yInterpolationCoord.end(), [](const RectaCoord& a, const RectaCoord& b) {return a.x < b.x; });
+		std::sort(negHeightCoord.begin(), negHeightCoord.end(), [](const RectaCoord& a, const RectaCoord& b) {return a.x < b.x; });
 
 		// Border
-		double borderContinusLen2 = borderContinusLen * borderContinusLen;
-		borderStore.clear();
+		double borderContinusLen2 = lineContinusLen * lineContinusLen;
+		lineStore.clear();
 		std::vector<RectaCoord> border;
 		for (const auto& pt : rectaCoord)
 		{
@@ -220,15 +220,15 @@ protected:
 				auto& last = border.back();
 				if ((pt.x - last.x) * (pt.x - last.x) + (pt.y - last.y) * (pt.y - last.y) > borderContinusLen2)
 				{
-					if (border.size() >= BorderLeastNumber)
-						borderStore.push_back(border);
+					if (border.size() >= lineLeastNumber)
+						lineStore.push_back(border);
 					border.clear();
 				}
 				border.push_back(pt);
 			}
 		}
-		if (border.size() >= BorderLeastNumber)
-			borderStore.push_back(border);
+		if (border.size() >= lineLeastNumber)
+			lineStore.push_back(border);
 	}
 
 	void onLMDRecive(LIM_HEAD& lim)
@@ -249,7 +249,7 @@ protected:
 			polarCoord[i].angle = static_cast<double>((lmd_info.nBAngle + i * (float)(lmd_info.nEAngle - lmd_info.nBAngle) / (lmd_info.nMDataNum - 1)) / 1000.0);
 			polarCoord[i].length = static_cast<double>(lmd[i]);
 		}
-		calcRectaCoord();
+		processCoord();
 	}
 
 	void onDeviceQuit()

@@ -88,7 +88,7 @@ int main()
 
 	auto& device = LimDevice::DeviceList.begin()->second;
 	infoBox.setArg("Angle", to_tstring((int)device.angleBeg) + '~' + to_tstring((int)device.angleEnd));
-	infoBox.setArg("Len", device.borderContinusLen);
+	infoBox.setArg("Len", device.lineContinusLen);
 
 	infoBox.x = 10;
 	infoBox.y = 10;
@@ -108,12 +108,12 @@ int main()
 				{
 					if (Msg.mkCtrl)
 					{
-						device.borderContinusLen += Msg.wheel / 120;
-						if (device.borderContinusLen < 0)
-							device.borderContinusLen = 0;
-						else if (device.borderContinusLen > 1000)
-							device.borderContinusLen = 1000;
-						infoBox.setArg("Len", device.borderContinusLen);
+						device.lineContinusLen += Msg.wheel / 120;
+						if (device.lineContinusLen < 0)
+							device.lineContinusLen = 0;
+						else if (device.lineContinusLen > 1000)
+							device.lineContinusLen = 1000;
+						infoBox.setArg("Len", device.lineContinusLen);
 					}
 					else
 					{
@@ -321,10 +321,10 @@ int main()
 			{
 				setlinestyle(PS_SOLID, 1);
 				setlinecolor(GREEN);
-				if (!device.yInterpolationCoord.empty())
+				if (!device.negHeightCoord.empty())
 				{
-					moveto(device.yInterpolationCoord.front().x, -device.yInterpolationCoord.front().y);
-					for (auto& [x, y] : device.yInterpolationCoord)
+					moveto(device.negHeightCoord.front().x, -device.negHeightCoord.front().y);
+					for (auto& [x, y] : device.negHeightCoord)
 					{
 						lineto(x, -y);
 					}
@@ -384,7 +384,7 @@ int main()
 			double fps = ::fps();
 
 			infoBox.setArg("FPS", fps, false, 0, 4);
-			infoBox.setArg("Borders", device.borderStore.size());
+			infoBox.setArg("Borders", device.lineStore.size());
 
 			if (fps < 5)
 			{
