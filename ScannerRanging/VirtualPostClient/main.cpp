@@ -34,8 +34,8 @@ int main()
 	{
 		constexpr int Y_STEP = 50;
 		constexpr int X_STEP = 50;
-		constexpr int X_NUM = 30;
-		constexpr int Y_NUM = 90;
+		constexpr int X_NUM = 60;
+		constexpr int Y_NUM = 180;
 
 		json body;
 		auto& device = LimDevice::DeviceList.begin()->second;
@@ -43,7 +43,7 @@ int main()
 			continue;
 		device.LockCoord();
 		body["cid"] = LimDevice::DeviceList.begin()->first;
-		body["x"] = x * X_STEP;
+		body["x"] = x * X_STEP / 0.5;
 		body["intime"] = std::chrono::system_clock::now().time_since_epoch().count();
 
 		int begin = ceil(device.negHeightCoord.front().x / (double)Y_STEP) * Y_STEP;
