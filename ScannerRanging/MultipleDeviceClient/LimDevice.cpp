@@ -1,7 +1,16 @@
 #include "LimDevice.h"
 
-void LimDevice::processCoord()
+void LimDevice::ProcessCoord()
 {
+
+	if (polarCoord.size() != rawData.nNumber)
+		polarCoord.resize(rawData.nNumber);
+	for (int i = 0; i < rawData.nNumber; i++)
+	{
+		polarCoord[i].angle = static_cast<double>((angleBeg + i * (float)(angleEnd - angleBeg) / (rawData.nNumber - 1)) / 1000.0);
+		polarCoord[i].length = static_cast<double>(rawData.¦Ñ[i]);
+	}
+
 	rectaCoord.clear();
 	negHeightCoord.clear();
 
@@ -64,6 +73,14 @@ void LimDevice::processCoord()
 		negHeightCoord.push_back(StdCoord{ x, getNextY(x) });
 }
 
+int LimDevice::getFacingDistance()
+{
+	if (rawData.angleBeg <= 9000 || rawData.angleEnd >= 9000)
+		return rawData.¦Ñ[(9000 - rawData.angleBeg) / 500];
+	else
+		return -10000;
+}
+
 void LimDevice::onLMDRecive(LIM_HEAD& lim)
 {
 	if (lim.nCode != LIM_CODE_LMD)
@@ -71,18 +88,16 @@ void LimDevice::onLMDRecive(LIM_HEAD& lim)
 	LMD_INFO& lmd_info = *LMD_Info(&lim);
 	LMD_D_Type* lmd = LMD_D(&lim);
 
-	angleBeg = lmd_info.nBAngle / 1000.;
-	angleEnd = lmd_info.nEAngle / 1000.;
-
 	std::lock_guard<std::mutex> lockGuard(coordLock);
-	if (polarCoord.size() != lmd_info.nMDataNum)
-		polarCoord.resize(lmd_info.nMDataNum);
+	rawData.nNumber = lmd_info.nMDataNum;
+	rawData.angleBeg = lmd_info.nBAngle;
+	rawData.angleEnd = lmd_info.nEAngle;
+	angleBeg = rawData.angleBeg / 1000.;
+	angleEnd = rawData.angleEnd / 1000.;
 	for (int i = 0; i < lmd_info.nMDataNum; i++)
-	{
-		polarCoord[i].angle = static_cast<double>((lmd_info.nBAngle + i * (float)(lmd_info.nEAngle - lmd_info.nBAngle) / (lmd_info.nMDataNum - 1)) / 1000.0);
-		polarCoord[i].length = static_cast<double>(lmd[i]);
-	}
-	processCoord();
+		rawData.¦Ñ[i] = lmd[i];
+
+	ProcessCoord();
 }
 
 void LimDevice::onDeviceQuit()

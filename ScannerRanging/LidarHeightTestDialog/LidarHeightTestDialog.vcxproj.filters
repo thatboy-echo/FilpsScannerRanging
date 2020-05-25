@@ -15,20 +15,59 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClInclude Include="LidarHeightTestDialog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LidarHeightTestDialogDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LidarHeightTestDialog.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MultipleDeviceClient\LimDevice.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="LidarHeightTestDialogDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\LidarDataPackage\LIM\lim.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\MultipleDeviceClient\LimDevice.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="LidarHeightTestDialog.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\LidarHeightTestDialog.rc2">
+      <Filter>资源文件</Filter>
+    </None>
     <None Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.dll">
       <Filter>头文件</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\LidarHeightTestDialog.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\LidarDataPackage\EquipmentComm\EquipmentComm.lib">

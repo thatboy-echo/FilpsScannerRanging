@@ -30,6 +30,14 @@ struct LimDevice
 
 public:
 	constexpr static double pi = 3.141592654;
+
+	struct RawData
+	{
+		int nNumber;
+		int angleBeg;
+		int angleEnd;
+		int ¦Ñ[541];
+	};
 	struct PolarCoord
 	{
 		double length;
@@ -47,19 +55,19 @@ public:
 	};
 
 	/// Êý¾Ý
+	RawData rawData;
 	bool isTryConnected = false;
 	std::atomic_bool isConnected = false;
 	std::string deviceIP;
 	double angleBeg = -45;
 	double angleEnd = 225;
-	double lineContinusLen = 100;
-	size_t lineLeastNumber = 3;
+
 
 	std::vector<PolarCoord> polarCoord;
 	std::vector<RectaCoord> rectaCoord;
 	std::vector<StdCoord> negHeightCoord;
 
-	static constexpr double MaxLength = 7000.;
+	static constexpr double MaxLength = 5000.;
 	inline static std::mutex staticDataLock;
 	inline static int OnlineDeviceNumber = 0;
 	inline static int SerialCID = 0x80;
@@ -68,8 +76,7 @@ public:
 
 	void LockCoord() { coordLock.lock(); }
 	void UnlockCoord() { coordLock.unlock(); }
-	void SetLineContinusLen(double len) { lineContinusLen = len; }
-	void SetLineLeastNumber(size_t num) { lineLeastNumber = num; }
+
 
 	~LimDevice();
 
@@ -78,10 +85,11 @@ public:
 	static void WaitFirstDeviceTryConnected();
 	static void StartLMDData();
 
+	void ProcessCoord();
+	int getFacingDistance();
 protected:
 	std::mutex coordLock;
 	int cid = 0XFFFFFFF;
-	void processCoord();
 	void onLMDRecive(LIM_HEAD& lim);
 	void onDeviceQuit();
 	static void CALLBACK onDataCallBack(int _cid, unsigned int _lim_code, void* _lim, int _lim_len, int _paddr);

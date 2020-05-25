@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VirtualDeviceClass", "Virtu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{47A1EEC6-8FCF-40FE-B689-D1F2E52502EA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LidarHeightTestDialog", "LidarHeightTestDialog\LidarHeightTestDialog.vcxproj", "{546BC298-717B-40D2-8D7F-CF76863F6DD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,14 @@ Global
 		{47A1EEC6-8FCF-40FE-B689-D1F2E52502EA}.Release|x64.Build.0 = Release|x64
 		{47A1EEC6-8FCF-40FE-B689-D1F2E52502EA}.Release|x86.ActiveCfg = Release|Win32
 		{47A1EEC6-8FCF-40FE-B689-D1F2E52502EA}.Release|x86.Build.0 = Release|Win32
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Debug|x64.ActiveCfg = Debug|x64
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Debug|x64.Build.0 = Debug|x64
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Debug|x86.ActiveCfg = Debug|Win32
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Debug|x86.Build.0 = Debug|Win32
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Release|x64.ActiveCfg = Release|x64
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Release|x64.Build.0 = Release|x64
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Release|x86.ActiveCfg = Release|Win32
+		{546BC298-717B-40D2-8D7F-CF76863F6DD9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

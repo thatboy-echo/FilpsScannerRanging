@@ -9,7 +9,7 @@ int main()
 {
 	using namespace thatboy;
 	LimDevice::InitEquipment();
-	LimDevice::OpenEquipment("192.168.1.210");
+	LimDevice::OpenEquipment("192.168.31.210");
 	LimDevice::WaitFirstDeviceTryConnected();
 	LimDevice::StartLMDData();
 
