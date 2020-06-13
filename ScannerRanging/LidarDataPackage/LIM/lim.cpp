@@ -10,8 +10,7 @@ unsigned int LIM_CheckSum(LIM_HEAD * _lim)
 	checksum ^= _lim->nCode;
 	checksum ^= _lim->nLIMLen;
 
-	int n;
-	for (n = 0; n < LIM_DATA_LEN; n++)
+	for (int n = 0; n < LIM_DATA_LEN; n++)
 		checksum ^= _lim->Data[n];
 
 	return checksum;

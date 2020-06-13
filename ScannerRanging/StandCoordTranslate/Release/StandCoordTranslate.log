@@ -1,0 +1,13 @@
+﻿  lim.cpp
+  Config.cpp
+  main.cpp
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): error C2131: 表达式的计算结果不是常数
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): message : 对未定义的函数或为未声明为“constexpr”的函数的调用导致了故障
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): message : 请参见“RadarMapping::angle2Index”的用法
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,62): error C2148: 数组的总大小不得超过 0x7fffffff 字节
+  RadarMapping.cpp
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): error C2131: 表达式的计算结果不是常数
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): message : 对未定义的函数或为未声明为“constexpr”的函数的调用导致了故障
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,44): message : 请参见“RadarMapping::angle2Index”的用法
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.h(87,62): error C2148: 数组的总大小不得超过 0x7fffffff 字节
+E:\Visual Studio Application\FilpsScannerRanging\ScannerRanging\StandCoordTranslate\RadarMapping.cpp(5,39): warning C4244: “return”: 从“double”转换到“int”，可能丢失数据
