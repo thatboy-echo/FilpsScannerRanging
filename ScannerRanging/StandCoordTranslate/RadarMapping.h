@@ -54,13 +54,13 @@ public:
 	//{
 	//	return (angle - DeviceAngleRangeMin) * DeviceAngleScale;
 	//}
-	static constexpr int angle2Index()
-	{
-		return 0;
-		std::stoi()
-	}
+	//static constexpr int angle2Index()
+	//{
+	//	return 0;
+	//	std::stoi()
+	//}
 
-	constexpr int  a = angle2Index();
+	//constexpr int  a = angle2Index();
 
 
 
@@ -106,7 +106,7 @@ public:
 	/// </summary>
 	double scanAngleEnd;
 
-	int rawRegionData[RegionXSize][angle2Index(/*StdScanAngleEnd*/) - angle2Index(StdScanAngleBegin) + 1];
+	//int rawRegionData[RegionXSize][angle2Index(/*StdScanAngleEnd*/) - angle2Index(StdScanAngleBegin) + 1];
 
 #pragma endregion
 
