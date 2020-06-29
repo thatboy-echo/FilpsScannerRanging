@@ -7,10 +7,10 @@
 #include "RadarMapping.hpp"
 
 
-#define LOG_INFO(...) Radar::logger.log(thatboy::logger::LogLevel::Info, ##__VA_ARGS__);
-#define LOG_WARNING(...) Radar::logger.log(thatboy::logger::LogLevel::Warning, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__);
-#define LOG_ERROR(...) Radar::logger.log(thatboy::logger::LogLevel::Error, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__);
-#define LOG_FATAL(...) Radar::logger.log(thatboy::logger::LogLevel::Fatal, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__);
+#define LOG_INFO(...) Radar::logger.log(thatboy::logger::LogLevel::Info, ##__VA_ARGS__)
+#define LOG_WARNING(...) Radar::logger.log(thatboy::logger::LogLevel::Warning, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__)
+#define LOG_ERROR(...) Radar::logger.log(thatboy::logger::LogLevel::Error, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__)
+#define LOG_FATAL(...) Radar::logger.log(thatboy::logger::LogLevel::Fatal, "@\"", __FILE__, "\":", __FUNCTION__, "<", __LINE__, ">: ", ##__VA_ARGS__)
 
 
 int main()
@@ -88,17 +88,11 @@ int main()
 
 		auto ret = client.Post(Radar::serverPath.c_str(), data.dump(), "application/json");
 		if (!ret)
-		{
 			LOG_FATAL("Failed to connect server. Timeout!");
-		}
 		else if (ret->status != 200)
-		{
 			LOG_ERROR("Server Code ", ret->status, " body: {", ret->body, "}");
-		}
 		else
-		{
 			LOG_INFO("Send data to server successed. body: {", ret->body, "}");
-		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(Radar::dataSendTimeSpan));
 	}
