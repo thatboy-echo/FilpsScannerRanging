@@ -102,5 +102,5 @@ int main()
 		, "; DistanceDevice ", Radar::distanceDeviceOnline ? "Online" : "Offline", ".");
 
 	LOG_INFO("Application closed normally.");
-	return 0;
+	return SUCCESS;
 }
