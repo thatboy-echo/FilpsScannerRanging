@@ -10,14 +10,14 @@
 namespace Radar
 {
 	enum { CID_DATA = 0XAA, CID_DISTANCE };
-	bool dataDeviceOnline = false;
-	bool distanceDeviceOnline = false;
+	bool dataDeviceOnline{ false };
+	bool distanceDeviceOnline{ false };
 	std::string dataDeviceIP;
 	std::string distanceDeviceIP;
 	clock_t dataSendTimeSpan;
 	clock_t deviceConnectTimeOut;
 	int mapXAccuracy;
-	constexpr auto PropertiesFilePath = "Application.properties";
+	constexpr auto PropertiesFilePath{ "Application.properties" };
 	thatboy::logger::FileLogger logger{ "lidar.log" };
 
 	std::string serverHost;
@@ -35,10 +35,10 @@ namespace Radar
 	/// <summary>
 	/// 数据回调函数
 	/// </summary>
-	/// <param name="_cid"></param>
-	/// <param name="_lim_code"></param>
-	/// <param name="_lim"></param>
-	/// <param name="_lim_len"></param>
+	/// <param name="_cid">设备编号</param>
+	/// <param name="_lim_code">数据类型</param>
+	/// <param name="_lim">数据</param>
+	/// <param name="_lim_len">长度</param>
 	/// <param name="_paddr"></param>
 	void CALLBACK onDataCallBack(INT _cid, UINT _lim_code, LPVOID _lim, INT _lim_len, INT _paddr)
 	{
@@ -89,10 +89,10 @@ namespace Radar
 	/// <summary>
 	/// 状态回调函数
 	/// </summary>
-	/// <param name="_cid"></param>
-	/// <param name="_state_code"></param>
-	/// <param name="_ip"></param>
-	/// <param name="_port"></param>
+	/// <param name="_cid">设备编号</param>
+	/// <param name="_state_code">状态码</param>
+	/// <param name="_ip">IP</param>
+	/// <param name="_port">端口</param>
 	/// <param name="_paddr"></param>
 	void CALLBACK onStateCallBack(INT _cid, UINT _state_code, LPCSTR _ip, INT _port, INT _paddr)
 	{
