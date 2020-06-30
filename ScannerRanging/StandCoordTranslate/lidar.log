@@ -13,3 +13,31 @@
 2020-6-27 19:06:08  [INFO] Application started.
 2020-6-27 19:06:08  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
 2020-6-27 19:06:08  [INFO] Device library initialization complete.
+2020-6-30 09:12:30  [INFO] Application started.
+2020-6-30 09:12:36  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
+2020-6-30 09:12:41  [INFO] Device library initialization complete.
+2020-6-30 09:12:49  [INFO] Devices online.
+2020-6-30 09:12:52  [INFO] Devices started.
+2020-6-30 09:13:27  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}
+2020-6-30 09:15:17  [INFO] Application started.
+2020-6-30 09:15:21  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
+2020-6-30 09:15:22  [INFO] Device library initialization complete.
+2020-6-30 09:15:34  [INFO] Devices online.
+2020-6-30 09:15:36  [INFO] Devices started.
+2020-6-30 09:16:01  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}
+2020-6-30 09:16:36  [INFO] Application started.
+2020-6-30 09:16:36  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
+2020-6-30 09:16:36  [INFO] Device library initialization complete.
+2020-6-30 09:16:40  [INFO] Devices online.
+2020-6-30 09:16:40  [INFO] Devices started.
+2020-6-30 09:16:48  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}
+2020-6-30 09:20:18  [INFO] Application started.
+2020-6-30 09:20:18  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
+2020-6-30 09:20:18  [INFO] Device library initialization complete.
+2020-6-30 09:20:27  [INFO] Devices started.
+2020-6-30 09:20:52  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}
+2020-6-30 09:21:23  [INFO] Application started.
+2020-6-30 09:21:23  [INFO] Properties:  DataDevice<192.168.31.210> DistanceDevice<192.168.31.202> DataSendTimeSpan<600000> DeviceConnectTimeOut<5000> MapXAccuracy<10>.
+2020-6-30 09:21:23  [INFO] Device library initialization complete.
+2020-6-30 09:21:27  [INFO] Devices started.
+2020-6-30 09:21:59  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}

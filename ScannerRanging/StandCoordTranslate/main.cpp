@@ -81,8 +81,7 @@ int main()
 		data["x"] = Radar::lidarX;
 		data["begin_angle"] = Radar::lidarBegin;
 		data["end_angle"] = Radar::lidarEnd;
-		for (const auto& polar : Radar::lidarPolar)
-			data["polar"].push_back(polar);
+		data["polar"] = Radar::lidarPolar;
 		Radar::lidarPolarLock.unlock();
 		Radar::lidarXLock.unlock();
 
