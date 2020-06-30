@@ -50,11 +50,14 @@ int main()
 		, "> MapXAccuracy<", Radar::mapXAccuracy, ">.");
 
 	// 初始化并连接设备
-	if (!EquipmentCommInit(NULL, Radar::onDataCallBack, Radar::onStateCallBack))
+	if (Radar::initDevices())
+		LOG_INFO("Device library initialization complete.");
+	else
+	{
+		LOG_FATAL("Device library initialization failed.");
 		return INIT_FAILED;
-	LOG_INFO("Device library initialization complete.");
-	OpenEquipmentComm(Radar::CID_DATA, Radar::dataDeviceIP.c_str(), 2112);
-	OpenEquipmentComm(Radar::CID_DISTANCE, Radar::distanceDeviceIP.c_str(), 2112);
+	}
+	
 	if (!Radar::waitDevicesOnline(Radar::deviceConnectTimeOut))
 	{
 		LOG_FATAL("Failed to connect devices. Timeout!");

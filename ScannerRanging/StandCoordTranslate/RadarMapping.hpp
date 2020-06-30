@@ -35,11 +35,11 @@ namespace Radar
 	/// <summary>
 	/// 数据回调函数
 	/// </summary>
-	/// <param name="_cid">设备编号</param>
-	/// <param name="_lim_code">数据类型</param>
-	/// <param name="_lim">数据</param>
-	/// <param name="_lim_len">长度</param>
-	/// <param name="_paddr"></param>
+	/// <param name="_cid">连接编号</param>
+	/// <param name="_lim_code">LIM Code</param>
+	/// <param name="_lim">LIM</param>
+	/// <param name="_lim_len">LIM包长度</param>
+	/// <param name="_paddr">用户数据</param>
 	void CALLBACK onDataCallBack(INT _cid, UINT _lim_code, LPVOID _lim, INT _lim_len, INT _paddr)
 	{
 		auto& lim = *static_cast<LIM_HEAD*>(_lim);
@@ -89,11 +89,11 @@ namespace Radar
 	/// <summary>
 	/// 状态回调函数
 	/// </summary>
-	/// <param name="_cid">设备编号</param>
-	/// <param name="_state_code">状态码</param>
+	/// <param name="_cid">连接编号</param>
+	/// <param name="_state_code">连接状态</param>
 	/// <param name="_ip">IP</param>
 	/// <param name="_port">端口</param>
-	/// <param name="_paddr"></param>
+	/// <param name="_paddr">用户数据</param>
 	void CALLBACK onStateCallBack(INT _cid, UINT _state_code, LPCSTR _ip, INT _port, INT _paddr)
 	{
 		switch (_state_code)
@@ -158,6 +158,15 @@ namespace Radar
 		LIM_Pack(lim, CID_DISTANCE, LIM_CODE_START_LMD);
 		SendLIM(CID_DISTANCE, lim, lim->nLIMLen);
 		LIM_Release(lim);
+	}
+
+	bool initDevices()
+	{
+		if (!EquipmentCommInit(NULL, Radar::onDataCallBack, Radar::onStateCallBack))
+			return false;
+		OpenEquipmentComm(Radar::CID_DATA, Radar::dataDeviceIP.c_str(), 2112);
+		OpenEquipmentComm(Radar::CID_DISTANCE, Radar::distanceDeviceIP.c_str(), 2112);
+		return true;
 	}
 
 	/// <summary>
