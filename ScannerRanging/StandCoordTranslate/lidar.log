@@ -41,3 +41,4 @@
 2020-6-30 09:21:23  [INFO] Device library initialization complete.
 2020-6-30 09:21:27  [INFO] Devices started.
 2020-6-30 09:21:59  [INFO] Send data to server successed. body: {{"type":"POST","info":"ok"}}
+2020-6-30 12:22:47  [INFO] Application started.

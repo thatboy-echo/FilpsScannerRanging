@@ -184,12 +184,12 @@ namespace Radar
 	{
 		std::string serverUrl;
 		Config cfg(PropertiesFilePath);
-		cfg.ReadInto(dataDeviceIP, "DataDeviceIp");
-		cfg.ReadInto(distanceDeviceIP, "DistanceDeviceIp");
-		cfg.ReadInto(dataSendTimeSpan, "DataSendTimeSpan");
-		cfg.ReadInto(deviceConnectTimeOut, "DeviceConnectTimeOut");
-		cfg.ReadInto(mapXAccuracy, "MapXAccuracy");
-		cfg.ReadInto(serverUrl, "ServerUrl");
+		cfg.ReadInto(dataDeviceIP, "Device.Data.IP");
+		cfg.ReadInto(distanceDeviceIP, "Device.Distance.IP");
+		cfg.ReadInto(dataSendTimeSpan, "Device.SendTimeSpan");
+		cfg.ReadInto(deviceConnectTimeOut, "Device.ConnectTimeOut");
+		cfg.ReadInto(mapXAccuracy, "Device.Distance.Accuracy");
+		cfg.ReadInto(serverUrl, "Server.Url");
 
 		auto postIpMark = serverUrl.find_first_of(':');
 		auto postPortMark = serverUrl.find_first_of('/');
